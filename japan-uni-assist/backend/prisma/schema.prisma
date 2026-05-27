@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String    @map("password_hash")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  profiles      StudentProfile[]
+  chatSessions  ChatSession[]
+  recommendations Recommendation[]
+
+  @@map("users")
+}
+
+model StudentProfile {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  gpa             Float
+  englishType     String   @map("english_type")
+  englishScore    Float    @map("english_score")
+  jlptLevel       String?  @map("jlpt_level")
+  bachelorSchool  String   @map("bachelor_school")
+  bachelorMajor   String   @map("bachelor_major")
+  budgetYen       Int?     @map("budget_yen")
+  targetMajor     String?  @map("target_major")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recommendations Recommendation[]
+
+  @@map("student_profiles")
+}
+
+model University {
+  id            String   @id @default(uuid())
+  name          String
+  nameJp        String   @map("name_jp")
+  location      String
+  ranking       Int?
+  type          String
+  tuitionYen    Int      @map("tuition_yen")
+  website       String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  programs      Program[]
+  professors    Professor[]
+
+  @@map("universities")
+}
+
+model Program {
+  id              String   @id @default(uuid())
+  universityId    String   @map("university_id")
+  name            String
+  degree          String
+  language        String
+  examType        String   @map("exam_type")
+  requirements    Json?    @map("requirements")
+  deadlines       Json?    @map("deadlines")
+
+  university      University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  @@map("programs")
+}
+
+model Professor {
+  id              String   @id @default(uuid())
+  universityId    String   @map("university_id")
+  name            String
+  nameJp          String   @map("name_jp")
+  researchField   String   @map("research_field")
+  email           String?
+  homepage        String?
+  labPage         String?  @map("lab_page")
+
+  university      University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  @@map("professors")
+}
+
+model Recommendation {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  profileId       String?  @map("profile_id")
+  category        String
+  universityId    String   @map("university_id")
+  programId       String?  @map("program_id")
+  reason          String   @db.Text
+  matchScore      Float    @map("match_score")
+  confidence      Float
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile         StudentProfile? @relation(fields: [profileId], references: [id])
+
+  @@map("recommendations")
+}
+
+model ChatSession {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  title         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  messages      ChatMessage[]
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id            String   @id @default(uuid())
+  sessionId     String   @map("session_id")
+  role          String
+  content       String   @db.Text
+  modelUsed     String?  @map("model_used")
+  tokenUsage    Json?    @map("token_usage")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  session       ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
+
+model Document {
+  id            String   @id @default(uuid())
+  sourceType    String   @map("source_type")
+  sourceUrl     String?  @map("source_url")
+  title         String
+  content       String   @db.Text
+  metadata      Json?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  chunks        DocumentChunk[]
+
+  @@map("documents")
+}
+
+model DocumentChunk {
+  id            String   @id @default(uuid())
+  documentId    String   @map("document_id")
+  content       String   @db.Text
+  embedding     Unsupported("vector(1536)")?
+
+  document      Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([embedding], type: Hnsw)
+  @@map("document_chunks")
+}

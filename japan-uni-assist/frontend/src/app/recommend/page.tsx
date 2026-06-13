@@ -12,11 +12,11 @@ const schema = z.object({
   gpa: z.coerce.number().min(0).max(4),
   english_type: z.enum(['TOEFL', 'IELTS']),
   english_score: z.coerce.number().min(0),
-  jlpt_level: z.enum(['N1', 'N2', 'N3', 'N4', 'N5']).optional(),
+  jlpt_level: z.preprocess((v) => v === '' ? undefined : v, z.enum(['N1', 'N2', 'N3', 'N4', 'N5']).optional()),
   bachelor_school: z.string().min(1),
   bachelor_major: z.string().min(1),
-  budget_yen: z.coerce.number().min(0).optional(),
-  target_major: z.string().optional(),
+  budget_yen: z.preprocess((v) => v === '' ? undefined : v, z.coerce.number().min(0).optional()),
+  target_major: z.preprocess((v) => v === '' ? undefined : v, z.string().optional()),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -34,7 +34,17 @@ export default function RecommendPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await api.recommend.submit(data);
+      const payload = {
+        gpa: data.gpa,
+        englishType: data.english_type,
+        englishScore: data.english_score,
+        jlptLevel: data.jlpt_level || undefined,
+        bachelorSchool: data.bachelor_school,
+        bachelorMajor: data.bachelor_major,
+        budgetYen: data.budget_yen || undefined,
+        targetMajor: data.target_major || undefined,
+      };
+      const res = await api.recommend.submit(payload);
       setResult(res.recommendations);
     } catch (e: any) {
       setError(e.message || '推荐失败，请稍后重试');

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { GraduationCap, MessageSquare, Search, Home, User } from 'lucide-react';
+import { GraduationCap, MessageSquare, Home, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function Navbar() {
@@ -17,7 +17,6 @@ export default function Navbar() {
     { href: '/', label: '首页', icon: Home },
     { href: '/recommend', label: '择校推荐', icon: GraduationCap },
     { href: '/chat', label: 'AI顾问', icon: MessageSquare },
-    { href: '/knowledge', label: '知识库', icon: Search },
   ];
 
   return (

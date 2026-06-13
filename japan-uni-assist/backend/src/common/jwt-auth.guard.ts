@@ -13,7 +13,7 @@ export class JwtAuthGuard implements CanActivate {
     }
     const token = authHeader.split(' ')[1];
     try {
-      const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+      const payload = this.jwtService.verify(token);
       request.user = payload;
       return true;
     } catch {

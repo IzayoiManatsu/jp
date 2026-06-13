@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -65,8 +65,8 @@ model Program {
   degree          String
   language        String
   examType        String   @map("exam_type")
-  requirements    Json?    @map("requirements")
-  deadlines       Json?    @map("deadlines")
+  requirements    String?    @map("requirements")
+  deadlines       String?    @map("deadlines")
 
   university      University @relation(fields: [universityId], references: [id], onDelete: Cascade)
 
@@ -95,7 +95,7 @@ model Recommendation {
   category        String
   universityId    String   @map("university_id")
   programId       String?  @map("program_id")
-  reason          String   @db.Text
+  reason          String
   matchScore      Float    @map("match_score")
   confidence      Float
   createdAt       DateTime @default(now()) @map("created_at")
@@ -123,9 +123,9 @@ model ChatMessage {
   id            String   @id @default(uuid())
   sessionId     String   @map("session_id")
   role          String
-  content       String   @db.Text
+  content       String
   modelUsed     String?  @map("model_used")
-  tokenUsage    Json?    @map("token_usage")
+  tokenUsage    String?  @map("token_usage")
   createdAt     DateTime @default(now()) @map("created_at")
 
   session       ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
@@ -138,8 +138,8 @@ model Document {
   sourceType    String   @map("source_type")
   sourceUrl     String?  @map("source_url")
   title         String
-  content       String   @db.Text
-  metadata      Json?
+  content       String
+  metadata      String?
   createdAt     DateTime @default(now()) @map("created_at")
 
   chunks        DocumentChunk[]
@@ -150,11 +150,10 @@ model Document {
 model DocumentChunk {
   id            String   @id @default(uuid())
   documentId    String   @map("document_id")
-  content       String   @db.Text
-  embedding     Unsupported("vector(1536)")?
+  content       String
+  embedding     String?
 
   document      Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
-  @@index([embedding], type: Hnsw)
   @@map("document_chunks")
 }

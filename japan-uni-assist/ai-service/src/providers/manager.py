@@ -1,5 +1,8 @@
 import os
+from dotenv import load_dotenv
 from typing import Optional, Dict, List
+
+load_dotenv()
 from src.providers.base import AIProvider
 from src.providers.openai_provider import OpenAIProvider
 from src.providers.claude_provider import ClaudeProvider

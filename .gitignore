@@ -1,0 +1,24 @@
+# Local generated code export
+/export_project_code_to_txt.cmd
+/project_code_dump.txt
+
+# Environment files
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Dependencies and build outputs
+node_modules/
+.next/
+dist/
+build/
+coverage/
+__pycache__/
+.venv/
+venv/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3

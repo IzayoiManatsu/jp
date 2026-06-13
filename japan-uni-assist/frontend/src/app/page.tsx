@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { GraduationCap, MessageSquare, Search, ArrowRight } from 'lucide-react';
+import { GraduationCap, MessageSquare, ArrowRight } from 'lucide-react';
 
 export default function HomePage() {
   const features = [
@@ -17,13 +17,6 @@ export default function HomePage() {
       href: '/chat',
       color: 'bg-green-50 text-green-600',
     },
-    {
-      title: 'RAG知识库',
-      desc: '基于日本大学募集要项、教授主页和留学FAQ的向量检索问答。',
-      icon: Search,
-      href: '/knowledge',
-      color: 'bg-purple-50 text-purple-600',
-    },
   ];
 
   return (
@@ -38,7 +31,7 @@ export default function HomePage() {
         </p>
       </section>
 
-      <section className="grid md:grid-cols-3 gap-6">
+      <section className="grid md:grid-cols-2 gap-6">
         {features.map((f) => {
           const Icon = f.icon;
           return (

@@ -45,7 +45,7 @@ export class ChatService {
     const { data } = await firstValueFrom(
       this.http.post(`${AI_SERVICE_URL}/chat`, {
         messages,
-        model: model || 'gpt-4o',
+        model: model || process.env.DEFAULT_MODEL || 'deepseek-chat',
         temperature: 0.7,
         stream: false,
       }),
@@ -57,7 +57,7 @@ export class ChatService {
         role: 'assistant',
         content: data.content,
         modelUsed: data.model,
-        tokenUsage: data.usage,
+        tokenUsage: JSON.stringify(data.usage),
       },
     });
 
@@ -85,7 +85,7 @@ export class ChatService {
     const response = await firstValueFrom(
       this.http.post(
         `${AI_SERVICE_URL}/chat/stream`,
-        { messages, model: model || 'gpt-4o', temperature: 0.7, stream: true },
+        { messages, model: model || process.env.DEFAULT_MODEL || 'deepseek-chat', temperature: 0.7, stream: true },
         { responseType: 'stream' },
       ),
     );
@@ -99,7 +99,7 @@ export class ChatService {
         sessionId,
         role: 'assistant',
         content,
-        modelUsed: model || 'unknown',
+        modelUsed: model || process.env.DEFAULT_MODEL || 'deepseek-chat',
       },
     });
 
